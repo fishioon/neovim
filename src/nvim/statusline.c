@@ -750,7 +750,7 @@ void draw_tabline(void)
       if (col >= Columns - 4) {
         break;
       }
-
+      tabcount++;
       int scol = col;
 
       if (tp == curtab) {
@@ -772,7 +772,11 @@ void draw_tabline(void)
         attr = win_hl_attr(cwp, HLF_TP);
       }
 
-      grid_line_put_schar(col++, schar_from_ascii(' '), attr);
+      vim_snprintf(NameBuff, MAXPATHL, "%d", tabcount);
+      grid_line_puts(col, NameBuff, -1, attr);
+      col += strlen(NameBuff);
+
+      grid_line_put_schar(col++, schar_from_ascii(':'), attr);
 
       bool modified = false;
 
@@ -803,7 +807,7 @@ void draw_tabline(void)
       if (room > 0) {
         // Get buffer name in NameBuff[]
         get_trans_bufname(cwp->w_buffer);
-        shorten_dir(NameBuff);
+        // shorten_dir(NameBuff);
         int len = vim_strsize(NameBuff);
         char *p = NameBuff;
         while (len > room) {
@@ -821,7 +825,6 @@ void draw_tabline(void)
 
       // Store the tab page number in tab_page_click_defs[], so that
       // jump_to_mouse() knows where each one is.
-      tabcount++;
       while (scol < col) {
         tab_page_click_defs[scol++] = (StlClickDefinition) {
           .type = kStlClickTabSwitch,
